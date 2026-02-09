@@ -11,8 +11,12 @@
     "server": "node .\\server\\server.js"
   },
   "dependencies": {
+    "cors": "^2.8.6",
+    "css-select": "^6.0.0",
     "express": "^5.2.1",
     "kysely": "^0.28.11",
+    "multer": "^2.0.2",
+    "nth-check": "^2.1.1",
     "pg": "^8.18.0",
     "pg-pool": "^3.11.0",
     "react": "^19.2.0",

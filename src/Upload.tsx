@@ -3,63 +3,153 @@ import tempLogo from './assets/TempLogo.png';
 import './Upload.css';
 
 function Upload() {
-    {/* 
-        state to hold selected file 
-        file is the variable used to store the file    
-        setFile is the function used to update the file variable
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [message, setMessage] = useState<string | null>(null);
+  const [uploadResult, setUploadResult] = useState<any>(null);
 
-        more research into "states" will be needed
-    */ } 
-    const [file, setFile] = useState<File | null>(null);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setFile(event.target.files[0]);
+      setMessage(null);
+      setProgress(0);
+      setUploadResult(null);
+    }
+  };
 
-    {/* 
-        handleFileChange is the name of the function that handles file input changes
-        event: React.ChangeEvent<HTMLInputElement> is the parameter the function takes
+  const handleUpload = () => {
+    if (!file) return;
 
-        this video explains the basic set up for file uploading along 
-        with other features i may implement later, but this iss 
-        https://www.youtube.com/watch?v=pWd6Enu2Pjs
-    */ } 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        /* check that .files exists and it has at least one file in it, if so, set file */
-        if (event.target.files && event.target.files.length > 0) {
-            setFile(event.target.files[0]);
-        }
+    setUploading(true);
+    setMessage(null);
+    setProgress(0);
+
+    const formData = new FormData();
+    formData.append('video', file);
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        setProgress(percentComplete);
+      }
     };
 
-    return (
-        <>
-            {/* display logo */}
-            <div>
-                <img src={tempLogo} className="logo" alt="Temp logo" />
+    xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            console.log('Progress:', percent, '%', event.loaded, '/', event.total);
+            setProgress(percent);
+        } else {
+            console.log('Progress not computable');
+        }
+        };
+
+
+
+    xhr.onload = () => {
+      setUploading(false);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          setUploadResult(data);
+          setMessage(`Success! Video saved as: ${data.filename}`);
+          setFile(null); // optional: clear selection
+          setProgress(0);
+        } catch (e) {
+          setMessage('Upload succeeded but response parsing failed');
+        }
+      } else {
+        setMessage(`Upload failed: ${xhr.statusText || 'Server error'}`);
+      }
+    };
+
+    xhr.onerror = () => {
+      setUploading(false);
+      setMessage('Network error during upload');
+    };
+
+    xhr.open('POST', 'http://localhost:3000/api/upload-video', true);
+    xhr.send(formData);
+  };
+
+  return (
+    <>
+      <div>
+        <img src={tempLogo} className="logo" alt="GameSync logo" />
+      </div>
+
+      <div className="upload-container">
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleFileChange}
+          id="video-upload"
+          style={{ display: 'none' }}
+        />
+
+        <label htmlFor="video-upload" className="upload-button">
+          Choose Video
+        </label>
+
+        {file && (
+          <div className="file-info">
+            Selected: {file.name} ({(file.size / (1024 * 1024)).toFixed(1)} MB)
+          </div>
+        )}
+
+        {file && (
+          <button
+            onClick={handleUpload}
+            disabled={uploading}
+            className="upload-button"
+            style={{ marginTop: '1rem', backgroundColor: '#0066cc' }}
+          >
+            {uploading ? 'Uploading...' : 'Send Video to Server'}
+          </button>
+        )}
+
+        {message && (
+          <div style={{
+            marginTop: '1rem',
+            padding: '10px',
+            borderRadius: '6px',
+            backgroundColor: message.includes('Error') ? '#ffe6e6' : '#e6ffe6',
+            color: message.includes('Error') ? '#cc0000' : '#006600',
+          }}>
+            {message}
+          </div>
+        )}
+
+        {uploadResult && (
+          <div className="result-container">
+            <p>Uploaded successfully!</p>
+            <p>Filename: {uploadResult.filename}</p>
+
+            {/* Video preview */}
+            <video width="500" controls style={{ margin: '1rem 0' }}>
+              <source
+                src={`http://localhost:3000/videofiles/${uploadResult.filename}`}
+                type="video/mp4"
+              />
+              Your browser does not support the video tag.
+            </video>
+
+            {/* All metadata dump */}
+            <div className="metadata-section">
+              <h4>Full Upload Metadata:</h4>
+              <pre>
+                {JSON.stringify(uploadResult, null, 2)}
+              </pre>
             </div>
+          </div>
+        )}
 
-            {/* upload functionality */}
-            <div className="upload-container">
-                {/* file input */}
-                <input
-                    type="file"
-                    accept="video/*"
-                    /* onChange is an event handler that calls handleFileChange*/
-                    onChange={handleFileChange}
-                    id="video-upload"
-                    style={{ display: 'none' }}
-                />
-
-                {/* styled label as button */} 
-                <label htmlFor="video-upload" className="upload-button">
-                    Upload Video
-                </label>
-
-                {/* display selected file name */}  
-                {file && (
-                    <div className="file-info">
-                        Selected file: {file.name}
-                    </div>
-                )}
-            </div>
-        </>
-    );
+      </div>
+    </>
+  );
 }
 
 export default Upload;
