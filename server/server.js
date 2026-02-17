@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
+import 'dotenv/config';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
