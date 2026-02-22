@@ -1,6 +1,9 @@
-require('dotenv').config(); // load .env
-const { Pool } = require('pg');
+import 'dotenv/config'; // automatically loads .env
+import pg from 'pg';
 
+const { Pool } = pg;
+
+// Create a pool with environment variables
 const pool = new Pool({
   user: process.env.PGUSER,
   host: process.env.PGHOST,
@@ -9,4 +12,4 @@ const pool = new Pool({
   port: process.env.PGPORT,
 });
 
-module.exports = pool;
+export default pool;
