@@ -96,4 +96,6 @@ PGDATABASE=[yourdatabasename]
 PGPORT=[yourportnumber/Usually5432]
 
 Finally try npm testDB and see if it works
-Before trying to run the server, if you intend on working with the database, run npm washDB (This clears out the database so don't use this if you want to keep the data you already have) and run npm initDB
+Before trying to run the server, if you intend on working with the database, run npm washDB (This clears out the database so don't use this if you want to keep the data you already have) and run npm initDB.
+
+To use the functions, follow the example in test-db.js
