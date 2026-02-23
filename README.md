@@ -83,3 +83,17 @@ To run Frontend:
 ```js
 npm run dev
 ```
+
+For the database side of things, install postgres onto your computer and I would recommend installing pgadmin 4 as well. This link should be the right site and the installer should give the option for pgadmin 4. https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+
+REMEMBER your password, user/superuser name and port number you set for postgres. Open pgadmin 4, and create a database (open the server section, right click on postgres 18.-- and hit create database). Next go into vs code and install the extension PostgreSQL, should have around 614,000 downloads to differentiate it from the other Postgres extensions. Once that is installed follow the instructions on the extension page to connect it to vs code.
+
+Finally create a .env file in the root folder and make sure its included in .gitignore. In that folder, put this
+PGUSER=[yourusername]
+PGPASSWORD=[yourpassword]
+PGHOST=localhost
+PGDATABASE=[yourdatabasename]
+PGPORT=[yourportnumber/Usually5432]
+
+Finally try npm testDB and see if it works
+Before trying to run the server, if you intend on working with the database, run npm washDB (This clears out the database so don't use this if you want to keep the data you already have) and run npm initDB
