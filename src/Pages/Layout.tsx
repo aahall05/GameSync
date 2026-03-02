@@ -14,7 +14,13 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
             <header className="site-header">
                 {/* display logo */}
-                <img src={tempLogo} alt="Logo" className="header-logo" />
+                <img
+                    src={tempLogo}
+                    alt="Logo"
+                    className="header-logo"
+                    onClick={() => navigate('/')}
+                    style={{ cursor: 'pointer' }}
+                />
 
                 <div className="header-right">
                 {/* if logged in, display account button, otherwise display login button */}

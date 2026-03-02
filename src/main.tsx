@@ -7,6 +7,7 @@ import SessionCreation from './Pages/SessionCreation'
 import { AuthProvider } from './AuthContext';
 import Login from './Pages/Login';
 import UserInformation from './Pages/UserInformation';
+import UserHomepage from './Pages/UserHomepage.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -17,11 +18,9 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="/" element={<Homepage />} />
                     <Route path="/create-session" element={<SessionCreation />} />
                     <Route path="/login-page" element={<Login />} />
-                    <Route path="/account-page" element={<UserInformation />} />
-                    {/* 
-                        add account page
-                        add 
-                    */}
+                    <Route path="/account-page" element={<UserHomepage />} />
+                    <Route path="/user-information" element={<UserInformation />} />
+                    
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
