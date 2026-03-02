@@ -44,3 +44,17 @@ export async function getTeamByid(team_id) {
     );
     return result.rows[0]; // return the team with the given id
 }
+
+/**
+ * Fetch a team by its name
+ * @param {string} name
+ * @return {Object} the team row with the given name
+ */
+export async function getTeamByName(name) {
+    const result = await pool.query(`
+        SELECT * FROM Teams WHERE name = $1
+        `,
+        [name]
+    );
+    return result.rows[0]; // return the team with the given name
+}

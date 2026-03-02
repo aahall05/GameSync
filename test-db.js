@@ -10,6 +10,9 @@ import {
 import { 
   createVideo, getVideosByCollage, getVideoById 
 } from './server/models/videos.js';
+import {
+  createUser, getTeamsByUser, getUserById, getUserByUsername, addUserToTeam, removeUserFromTeam
+} from './server/models/users.js';
 
 async function testDBFunctions() {
   try {
@@ -54,6 +57,10 @@ async function testDBFunctions() {
 
     const fetchedVideo = await getVideoById(newVideo.id);
     console.log('Fetched video by ID:', fetchedVideo);
+
+    console.log('\n--- Testing Users ---');
+    const newUser = await createUser({ username: 'Coach', password_hash: 12345 });
+    console.log('Created user:', newUser);
 
   } catch (err) {
     console.error('❌ Error testing DB functions:', err);
