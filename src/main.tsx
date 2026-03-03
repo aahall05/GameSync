@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import './index.css'
 import Homepage from './Pages/Homepage.tsx'
 import SessionCreation from './Pages/SessionCreation'
+import Upload from './Pages/Upload'
 import { AuthProvider } from './AuthContext';
 import Login from './Pages/Login';
 import UserInformation from './Pages/UserInformation';
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="/login-page" element={<Login />} />
                     <Route path="/account-page" element={<UserHomepage />} />
                     <Route path="/user-information" element={<UserInformation />} />
+                    <Route path="/upload/:collageId" element={<Upload />} />
                     
                 </Routes>
             </BrowserRouter>

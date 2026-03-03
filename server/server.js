@@ -8,6 +8,7 @@ import 'dotenv/config';
 import { getTeamByName } from './models/teams.js';
 import { createCollage } from './models/collages.js';
 import { getUserByUsername } from './models/users.js';
+import { createVideo } from './models/videos.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -199,30 +200,45 @@ const upload = multer({
 });
 
 
-// old Upload route
+app.post('/api/upload/:collageId', upload.single('video'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No video file received' });
+    }
 
-// app.post('/api/upload-video', upload.single('video'), (req, res) => {
-//   try {
-//     if (!req.file) {
-//       return res.status(400).json({ error: 'No video file received' });
-//     }
+    // Get collageId from URL parameter
+    const collageId = parseInt(req.params.collageId, 10);
 
-//     const filePath = `/VideoFileStorage/${req.file.filename}`;
-//     const fullPath = path.join(__dirname, '..', 'VideoFileStorage', req.file.filename);
 
-//     res.status(201).json({
-//       message: 'Video uploaded successfully',
-//       filename: req.file.filename,
-//       originalName: req.file.originalname,
-//       path: filePath,           // relative path
-//       fullPath,                 // absolute path (for server use)
-//       size: req.file.size,
-//     });
-//   } catch (err) {
-//     console.error('Upload error:', err);
-//     res.status(500).json({ error: err.message || 'Upload failed' });
-//   }
-// });
+
+    const relativePath = `/videofiles/${req.file.filename}`;  // note: matches your static route
+    const fullPath = path.join(__dirname, '..', 'VideoFileStorage', req.file.filename);
+
+
+    await createVideo({
+      collage_id: collageId,
+      filename: req.file.filename,
+      original_name: req.file.originalname,
+      path: relativePath,
+      size: req.file.size,
+      mime_type: req.file.mimetype,
+      createdAt: Date().now,
+    });
+
+    res.status(201).json({
+      message: 'Video uploaded successfully',
+      collageId,                    // ← important for frontend
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      path: relativePath,
+      fullPath,                     // mostly for debugging/server-side
+      size: req.file.size,
+    });
+  } catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: err.message || 'Upload failed' });
+  }
+});
 
 
 // Serve the uploaded files statically (so browser can see them)
@@ -241,37 +257,41 @@ app.post('/api/sessions', async (req, res) => {
 
     //Look up team by organization name
     const team = await getTeamByName(organizationName);
-    
+
     if (!team) {
       return res.status(404).json({ error: `Team with name "${organizationName}" not found` });
     }
 
-    // create collage with the team_id
-    const collage = await createCollage({
-      team_id: team.id,
-      name: eventName,
-      created_at: createdAt || null
-    });
+    if (team) {
+      // create collage with the team_id
+      const collage = await createCollage({
+        team_id: team.id,
+        name: eventName,
+        created_at: createdAt || null
+      });
 
-    res.status(201).json({
-      message: 'Session created successfully',
-      collage,
-      team_id: team.id,
-      session: {
-        collageId: collage.id,
-        eventName,
-        organizationName,
-        teamId: team.id,
-        date,
-        time,
-        description,
-        createdAt
+      res.status(201).json({
+        message: 'Session created successfully',
+        collage,
+        team_id: team.id,
+        session: {
+          collageId: collage.id,
+          eventName,
+          organizationName,
+          teamId: team.id,
+          date,
+          time,
+          description,
+          createdAt
+        }
+        });
       }
-    });
-  } catch (err) {
-    console.error('Session creation error:', err);
-    res.status(500).json({ error: err.message || 'Failed to create session' });
+    }
+  catch (err) {
+    console.error('Upload error:', err);
+    res.status(500).json({ error: err.message || 'Upload failed' });
   }
+    
 });
 
 
